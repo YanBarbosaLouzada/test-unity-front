@@ -8,7 +8,7 @@ function App() {
   const [count, setCount] = useState(0)
   const handleClick = async () => {
     try {
-      const response = await axios.post('http://localhost:3001/api/cadastrar', {
+      const response = await axios.post('https://github.com/YanBarbosaLouzada/test-unity-front.git/api/cadastrar', {
         msg: 'Olá backend!'
       });
       console.log(response.data);
