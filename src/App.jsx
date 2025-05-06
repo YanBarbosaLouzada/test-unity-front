@@ -5,7 +5,7 @@ function App() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
-    const ws = new WebSocket('wss://test-unity-back.onrender.com:8080');
+    const ws = new WebSocket('ws://https://test-unity-back.onrender.com:8080'); 
     setSocket(ws);
 
     ws.onmessage = (event) => {
