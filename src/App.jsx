@@ -1,24 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import axios from 'axios'
+import React, { useEffect, useState } from 'react';
 
 function App() {
-  const [count, setCount] = useState(0)
-  const handleClick = async () => {
-    try {
-      const response = await axios.post('https://test-unity-back.onrender.com/api/cadastrar', {
-        msg: 'Olá backend!'
-      });
-      console.log(response.data);
-    } catch (err) {
-      console.error('Erro ao enviar:', err);
+  const [socket, setSocket] = useState(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8080');
+    setSocket(ws);
+
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setPosition(data);
+    };
+
+    ws.onerror = (error) => {
+      console.error('WebSocket Error:', error);
+    };
+
+    ws.onclose = () => {
+      console.log('WebSocket fechado');
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
+
+  const sendMovement = (direction) => {
+    if (socket) {
+      socket.send(JSON.stringify({ action: 'move', direction }));
     }
   };
 
-  return <button onClick={handleClick}>Enviar para o backend</button>;
+  return (
+    <div>
+      <h1>Movimento do Personagem</h1>
+      <p>Status: {socket ? '✅ Conectado' : '❌ Desconectado'}</p>
 
+      <div>
+        <button onClick={() => sendMovement('up')} disabled={!socket}>↑</button>
+        <button onClick={() => sendMovement('down')} disabled={!socket}>↓</button>
+        <button onClick={() => sendMovement('left')} disabled={!socket}>←</button>
+        <button onClick={() => sendMovement('right')} disabled={!socket}>→</button>
+      </div>
+
+      <div>
+        <p>Posição do personagem: X: {position.x} Y: {position.y}</p>
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
+// src/App.css
